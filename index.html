@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>datagov — Data governance, fully in-house</title>
+    <meta name="description" content="datagov is a fully white-label, self-hosted data governance hub. Catalog, lineage, dictionary and an AI assistant that only ever sees the data you choose to expose to the model you choose to use.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        welcome: {
+                            blue: '#2d3b4e',
+                            teal: '#00cf95',
+                            tealhover: '#00a87a',
+                            gray: '#616c7a',
+                            light: '#f4f5f6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232d3b4e'/%3E%3Ctext x='16' y='22' font-family='Inter,sans-serif' font-size='15' font-weight='800' fill='white' text-anchor='middle'%3EDG%3C/text%3E%3C/svg%3E">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        html { scroll-behavior: smooth; }
+
+        /* Animated grid background for hero */
+        .hero-grid {
+            background-image:
+                linear-gradient(to right, rgba(45, 59, 78, 0.06) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(45, 59, 78, 0.06) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 40%, transparent 100%);
+            -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 40%, transparent 100%);
+        }
+
+        /* Soft glow for the teal accents */
+        .glow-teal {
+            box-shadow: 0 10px 40px -10px rgba(0, 207, 149, 0.4), 0 0 0 1px rgba(0, 207, 149, 0.1);
+        }
+
+        /* Subtle card hover */
+        .feat-card {
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+        .feat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px -12px rgba(45, 59, 78, 0.18);
+            border-color: rgba(0, 207, 149, 0.4);
+        }
+
+        /* Pulsing dot */
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+
+        /* Float animation for chat */
+        @keyframes float-in {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .float-in { animation: float-in 0.6s ease-out backwards; }
+
+        /* Connector pill base */
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+    <!-- ===================== NAV ===================== -->
+    <header class="sticky top-0 z-40 bg-slate-50/80 backdrop-blur-md border-b border-slate-200/60">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <!-- DG Logo -->
+            <a href="#" class="flex items-center gap-2.5 group">
+                <div class="w-9 h-9 rounded-lg bg-welcome-blue flex items-center justify-center text-white font-extrabold text-[13px] tracking-tight shadow-md shadow-welcome-blue/30 group-hover:shadow-welcome-blue/50 transition-shadow">
+                    DG
+                </div>
+                <span class="text-lg font-extrabold text-welcome-blue tracking-tight">datagov</span>
+            </a>
+
+            <!-- Center links -->
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+                <a href="#features" class="hover:text-welcome-blue transition-colors">Features</a>
+                <a href="#security" class="hover:text-welcome-blue transition-colors">Security</a>
+                <a href="#chat" class="hover:text-welcome-blue transition-colors">AI Chat</a>
+                <a href="#how" class="hover:text-welcome-blue transition-colors">How it works</a>
+            </nav>
+
+            <!-- CTAs -->
+            <div class="flex items-center gap-3">
+                <a href="/accounts/login/" class="hidden sm:inline-flex text-sm font-semibold text-slate-600 hover:text-welcome-blue px-3 py-2 rounded-lg transition-colors">Sign in</a>
+                <a href="#cta" class="inline-flex items-center gap-1.5 text-sm font-semibold bg-welcome-blue hover:bg-slate-800 text-white px-4 py-2 rounded-lg shadow-md shadow-welcome-blue/20 transition-all hover:scale-[1.02]">
+                    Book a demo
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===================== HERO ===================== -->
+    <section class="relative overflow-hidden">
+        <!-- Background blobs (same as login.html) -->
+        <div class="absolute top-0 right-0 -mr-40 -mt-20 w-[500px] h-[500px] bg-welcome-teal/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 -ml-40 -mb-40 w-[500px] h-[500px] bg-welcome-blue/10 rounded-full blur-3xl pointer-events-none"></div>
+        <!-- Grid -->
+        <div class="absolute inset-0 hero-grid pointer-events-none"></div>
+
+        <div class="relative max-w-7xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
+            <div class="max-w-3xl mx-auto text-center">
+                <!-- Eyebrow -->
+                <div class="inline-flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-full shadow-sm mb-6">
+                    <span class="relative flex h-2 w-2">
+                        <span class="absolute inline-flex h-full w-full rounded-full bg-welcome-teal opacity-75 pulse-dot"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-welcome-teal"></span>
+                    </span>
+                    <span class="text-[11px] font-bold text-welcome-blue tracking-[0.18em] uppercase">Data Governance · 100% In-house</span>
+                </div>
+
+                <!-- Headline -->
+                <h1 class="text-5xl md:text-7xl font-extrabold text-welcome-blue leading-[1.02] tracking-tight">
+                    Data governance,
+                    <span class="relative inline-block">
+                        <span class="relative z-10 text-welcome-teal">fully in-house.</span>
+                        <span class="absolute bottom-1 left-0 right-0 h-3 bg-welcome-teal/15 -z-0 rounded"></span>
+                    </span>
+                </h1>
+
+                <!-- Sub -->
+                <p class="mt-7 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto">
+                    A white-label, self-hosted catalog with an AI assistant that only sees what <em class="text-welcome-blue not-italic font-semibold">you</em> expose, using the model <em class="text-welcome-blue not-italic font-semibold">you</em> choose. Built for teams that take privacy seriously.
+                </p>
+
+                <!-- CTAs -->
+                <div class="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <a href="#cta" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-welcome-blue hover:bg-slate-800 text-white font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-welcome-blue/20 transition-all hover:scale-[1.02]">
+                        Book a demo
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                    <a href="#features" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-welcome-blue font-bold px-6 py-3.5 rounded-xl border border-slate-200 transition-all">
+                        See how it works
+                    </a>
+                </div>
+
+                <!-- Trust strip -->
+                <div class="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    <span class="flex items-center gap-1.5"><svg class="w-4 h-4 text-welcome-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg> Self-hosted</span>
+                    <span class="flex items-center gap-1.5"><svg class="w-4 h-4 text-welcome-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> White-label</span>
+                    <span class="flex items-center gap-1.5"><svg class="w-4 h-4 text-welcome-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Bring your own LLM</span>
+                    <span class="flex items-center gap-1.5"><svg class="w-4 h-4 text-welcome-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Zero data egress</span>
+                </div>
+            </div>
+
+            <!-- Hero product preview -->
+            <div class="relative mt-16 md:mt-20 max-w-5xl mx-auto">
+                <div class="absolute -inset-2 bg-gradient-to-r from-welcome-teal/20 via-welcome-blue/20 to-welcome-teal/20 rounded-2xl blur-2xl"></div>
+                <div class="relative bg-white rounded-2xl shadow-2xl shadow-welcome-blue/10 border border-slate-200 overflow-hidden">
+                    <!-- Browser chrome -->
+                    <div class="h-9 bg-slate-50 border-b border-slate-200 flex items-center px-4 gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-300"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-300"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-300"></span>
+                        <span class="ml-4 text-[11px] font-medium text-slate-400">app.yourcompany.com / datagov</span>
+                    </div>
+                    <!-- Mock dashboard -->
+                    <div class="grid grid-cols-12 min-h-[340px]">
+                        <!-- Sidebar -->
+                        <aside class="col-span-2 bg-welcome-blue p-3 hidden md:block">
+                            <div class="flex items-center gap-2 mb-5 px-1">
+                                <div class="w-7 h-7 rounded bg-welcome-teal flex items-center justify-center text-white font-extrabold text-[10px]">DG</div>
+                                <span class="text-white font-bold text-xs">datagov</span>
+                            </div>
+                            <div class="space-y-0.5 text-[11px]">
+                                <div class="px-2 py-1.5 text-welcome-teal bg-slate-800/50 rounded border-l-2 border-welcome-teal font-semibold">Dashboard</div>
+                                <div class="px-2 py-1.5 text-slate-300">Catalog</div>
+                                <div class="px-2 py-1.5 text-slate-300">Dictionary</div>
+                                <div class="px-2 py-1.5 text-slate-300">Lineage</div>
+                                <div class="px-2 py-1.5 text-slate-300">Insights</div>
+                                <div class="px-2 py-1.5 text-slate-300">AI Assistant</div>
+                            </div>
+                        </aside>
+                        <!-- Main -->
+                        <div class="col-span-12 md:col-span-10 p-5 bg-slate-50/50">
+                            <div class="grid grid-cols-3 gap-3 mb-4">
+                                <div class="bg-white rounded-lg p-3 border border-slate-200">
+                                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Reports</div>
+                                    <div class="text-2xl font-extrabold text-welcome-blue mt-1">1,284</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 border border-slate-200">
+                                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Measures</div>
+                                    <div class="text-2xl font-extrabold text-welcome-blue mt-1">3,792</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 border border-slate-200">
+                                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Cleanup</div>
+                                    <div class="text-2xl font-extrabold text-rose-500 mt-1">186</div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-lg border border-slate-200 p-4">
+                                <div class="text-xs font-bold text-welcome-blue mb-3">Lineage</div>
+                                <svg viewBox="0 0 400 120" class="w-full h-28">
+                                    <defs>
+                                        <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/></marker>
+                                    </defs>
+                                    <line x1="40" y1="60" x2="130" y2="35" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#arr)"/>
+                                    <line x1="40" y1="60" x2="130" y2="85" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#arr)"/>
+                                    <line x1="170" y1="35" x2="260" y2="60" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#arr)"/>
+                                    <line x1="170" y1="85" x2="260" y2="60" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#arr)"/>
+                                    <line x1="300" y1="60" x2="360" y2="60" stroke="#00cf95" stroke-width="2" marker-end="url(#arr)"/>
+                                    <circle cx="30" cy="60" r="14" fill="#2d3b4e"/><text x="30" y="64" font-size="9" font-weight="700" fill="white" text-anchor="middle">src</text>
+                                    <circle cx="150" cy="35" r="12" fill="#fff" stroke="#cbd5e1"/><text x="150" y="39" font-size="8" fill="#475569" text-anchor="middle">stg</text>
+                                    <circle cx="150" cy="85" r="12" fill="#fff" stroke="#cbd5e1"/><text x="150" y="89" font-size="8" fill="#475569" text-anchor="middle">stg</text>
+                                    <circle cx="280" cy="60" r="14" fill="#fff" stroke="#cbd5e1"/><text x="280" y="64" font-size="9" fill="#475569" text-anchor="middle">mart</text>
+                                    <rect x="345" y="48" width="40" height="24" rx="4" fill="#00cf95"/><text x="365" y="64" font-size="9" font-weight="700" fill="white" text-anchor="middle">BI</text>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== CONNECTORS STRIP ===================== -->
+    <section class="border-y border-slate-200 bg-white">
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            <div class="flex flex-col md:flex-row items-start md:items-center md:justify-between gap-4">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-[0.18em]">Connect anything → govern everything</p>
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="pill bg-welcome-teal/10 text-welcome-tealhover border border-welcome-teal/20">
+                        <span class="w-1.5 h-1.5 rounded-full bg-welcome-teal"></span>
+                        BI platforms
+                    </span>
+                    <span class="pill bg-welcome-teal/10 text-welcome-tealhover border border-welcome-teal/20">
+                        <span class="w-1.5 h-1.5 rounded-full bg-welcome-teal"></span>
+                        Transformation layers
+                    </span>
+                    <span class="pill bg-welcome-teal/10 text-welcome-tealhover border border-welcome-teal/20">
+                        <span class="w-1.5 h-1.5 rounded-full bg-welcome-teal"></span>
+                        Cloud warehouses
+                    </span>
+                    <span class="pill bg-slate-100 text-slate-500 border border-slate-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                        Relational DBs · soon
+                    </span>
+                    <span class="pill bg-slate-100 text-slate-500 border border-slate-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                        & more
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== FEATURES ===================== -->
+    <section id="features" class="py-24 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="max-w-2xl mx-auto text-center mb-14">
+                <p class="text-xs font-bold text-welcome-teal uppercase tracking-[0.2em] mb-3">What's inside</p>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-welcome-blue tracking-tight">Everything your data team already wished they had.</h2>
+                <p class="mt-4 text-slate-600 leading-relaxed">A full governance toolkit, in one private deployment. No SaaS. No data leaving your perimeter.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- 1 Catalog -->
+                <div class="feat-card bg-white rounded-xl border border-slate-200 p-6">
+                    <div class="w-11 h-11 rounded-lg bg-welcome-teal/10 text-welcome-tealhover flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                    </div>
+                    <h3 class="font-bold text-welcome-blue text-lg">Unified Catalog</h3>
+                    <p class="mt-2 text-sm text-slate-600 leading-relaxed">One searchable inventory of every table, column, measure and report across your entire stack.</p>
+                </div>
+                <!-- 2 Dictionary -->
+                <div class="feat-card bg-white rounded-xl border border-slate-200 p-6">
+                    <div class="w-11 h-11 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    </div>
+                    <h3 class="font-bold text-welcome-blue text-lg">Data Dictionary</h3>
+                    <p class="mt-2 text-sm text-slate-600 leading-relaxed">Definitions, owners, stewards, tags and SLAs on every asset — finally in one place.</p>
+                </div>
+                <!-- 3 Lineage -->
+                <div class="feat-card bg-white rounded-xl border border-slate-200 p-6">
+                    <div class="w-11 h-11 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                    </div>
+                    <h3 class="font-bold text-welcome-blue text-lg">Lineage Graph</h3>
+                    <p class="mt-2 text-sm text-slate-600 leading-relaxed">Cross-tool dependency map. Click any node to see what breaks downstream if it changes.</p>
+                </div>
+                <!-- 4 Cleanup -->
+                <div class="feat-card bg-white rounded-xl border border-slate-200 p-6">
+                    <div class="w-11 h-11 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                    </div>
+                    <h3 class="font-bold text-welcome-blue text-lg">Cleanup &amp; Impact Insights</h3>
+                    <p class="mt-2 text-sm text-slate-600 leading-relaxed">Surface unused columns and measures, plus the highest-impact assets your team should care about most.</p>
+                </div>
+                <!-- 5 AI Chat -->
+                <div class="feat-card bg-white rounded-xl border border-slate-200 p-6 relative overflow-hidden">
+                    <div class="absolute -top-6 -right-6 w-24 h-24 bg-welcome-teal/10 rounded-full blur-2xl"></div>
+                    <div class="relative">
+                        <div class="w-11 h-11 rounded-lg bg-welcome-teal text-white flex items-center justify-center mb-4 shadow-md shadow-welcome-teal/30">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-bold text-welcome-blue text-lg">AI Assistant</h3>
+                            <span class="text-[10px] font-bold text-welcome-tealhover bg-welcome-teal/10 px-1.5 py-0.5 rounded">BYO LLM</span>
+                        </div>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed">Chat over your catalog, lineage and SQL — using <strong>your</strong> model, with strict guardrails. Zero hallucination, tool-grounded answers.</p>
+                    </div>
+                </div>
+                <!-- 6 Alerts -->
+                <div class="feat-card bg-white rounded-xl border border-slate-200 p-6">
+                    <div class="w-11 h-11 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    </div>
+                    <h3 class="font-bold text-welcome-blue text-lg">Pipeline Alerts</h3>
+                    <p class="mt-2 text-sm text-slate-600 leading-relaxed">Slack notifications on every sync — run metrics, durations and failure traces, so engineers catch issues fast.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SECURITY (THE HEADLINE) ===================== -->
+    <section id="security" class="py-24 bg-welcome-blue text-white relative overflow-hidden">
+        <div class="absolute top-0 right-0 -mr-40 w-[500px] h-[500px] bg-welcome-teal/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 -ml-40 w-[400px] h-[400px] bg-welcome-teal/5 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative max-w-7xl mx-auto px-6">
+            <div class="grid lg:grid-cols-2 gap-12 items-start">
+                <div>
+                    <p class="text-xs font-bold text-welcome-teal uppercase tracking-[0.2em] mb-3">Privacy &amp; security</p>
+                    <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-tight">Your data never<br>leaves your perimeter.</h2>
+                    <p class="mt-5 text-slate-300 leading-relaxed text-lg">datagov is delivered as a fully <strong class="text-white">white-label, in-house</strong> deployment. There is no shared SaaS tenant, no third-party data plane, no telemetry phoning home.</p>
+                    <p class="mt-4 text-slate-300 leading-relaxed">You own the infrastructure. You own the database. You own the model. We just build the software that runs on top.</p>
+
+                    <div class="mt-8 inline-flex items-center gap-3 bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3">
+                        <svg class="w-5 h-5 text-welcome-teal flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        <span class="text-sm font-semibold text-slate-200">Dockerized · Postgres · Nginx · runs anywhere</span>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <!-- Privacy card 1 -->
+                    <div class="bg-slate-800/40 border border-slate-700 rounded-xl p-5 hover:border-welcome-teal/50 transition-colors">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-welcome-teal/15 text-welcome-teal flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white">Deployed in your VPC / on-prem</h4>
+                                <p class="text-sm text-slate-400 mt-1 leading-relaxed">Your cloud account, your network, your auth. Zero external dependencies for the core product.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Privacy card 2 -->
+                    <div class="bg-slate-800/40 border border-slate-700 rounded-xl p-5 hover:border-welcome-teal/50 transition-colors">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-welcome-teal/15 text-welcome-teal flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white">Bring your own model</h4>
+                                <p class="text-sm text-slate-400 mt-1 leading-relaxed">Point the assistant at OpenAI, Azure OpenAI, Anthropic, or a fully local LLM. The model only ever sees the metadata <strong class="text-slate-200">you</strong> whitelist.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Privacy card 3 -->
+                    <div class="bg-slate-800/40 border border-slate-700 rounded-xl p-5 hover:border-welcome-teal/50 transition-colors">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-welcome-teal/15 text-welcome-teal flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white">Read-only by default</h4>
+                                <p class="text-sm text-slate-400 mt-1 leading-relaxed">Live query tools are <code class="bg-slate-900 text-welcome-teal px-1.5 py-0.5 rounded text-xs font-semibold">SELECT</code>-only, dry-run first, byte-capped, and row-capped.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Privacy card 4 -->
+                    <div class="bg-slate-800/40 border border-slate-700 rounded-xl p-5 hover:border-welcome-teal/50 transition-colors">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-welcome-teal/15 text-welcome-teal flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white">Per-org feature flags</h4>
+                                <p class="text-sm text-slate-400 mt-1 leading-relaxed">Toggle live tools per source. Your admins decide exactly what the assistant is allowed to touch.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== AI CHAT SHOWCASE ===================== -->
+    <section id="chat" class="py-24 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="max-w-2xl mx-auto text-center mb-12">
+                <p class="text-xs font-bold text-welcome-teal uppercase tracking-[0.2em] mb-3">AI assistant</p>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-welcome-blue tracking-tight">An assistant that actually knows your data.</h2>
+                <p class="mt-4 text-slate-600 leading-relaxed">Grounded in your catalog. Restricted to your guardrails. Speaks <em>your</em> data definitions, not generic ones.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-5 gap-6 items-start">
+                <!-- Chat mock -->
+                <div class="lg:col-span-3">
+                    <div class="bg-white rounded-2xl shadow-xl shadow-welcome-blue/10 border border-slate-200 overflow-hidden">
+                        <!-- Header -->
+                        <div class="px-4 py-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-welcome-teal flex items-center justify-center text-white font-extrabold text-[11px]">DG</div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-welcome-blue">Governance Assistant</h3>
+                                    <p class="text-[10px] text-slate-500 font-medium">Connected to your catalog</p>
+                                </div>
+                            </div>
+                            <span class="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot"></span>
+                                Online
+                            </span>
+                        </div>
+                        <!-- Messages -->
+                        <div class="p-5 space-y-4 bg-slate-50/40 min-h-[420px]">
+                            <!-- User msg -->
+                            <div class="flex justify-end float-in" style="animation-delay: 0.05s">
+                                <div class="bg-welcome-blue text-white rounded-2xl rounded-tr-sm px-3.5 py-2 max-w-[80%] shadow-sm text-sm">
+                                    Where is <code class="bg-slate-700 px-1 rounded text-xs">revenue_per_booking</code> defined?
+                                </div>
+                            </div>
+                            <!-- AI msg -->
+                            <div class="flex items-start gap-2 float-in" style="animation-delay: 0.4s">
+                                <div class="w-7 h-7 rounded-lg bg-welcome-teal flex items-center justify-center text-white font-extrabold text-[10px] flex-shrink-0 mt-1">DG</div>
+                                <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-sm px-3.5 py-2.5 max-w-[85%] shadow-sm text-sm text-slate-700 leading-relaxed">
+                                    Found <strong>1 measure</strong> in semantic model <strong>finance_core</strong>:
+                                    <table class="mt-2 w-full text-xs border-collapse">
+                                        <thead><tr class="text-left text-slate-500"><th class="pr-3 pb-1 font-semibold">Name</th><th class="pr-3 pb-1 font-semibold">Owner</th><th class="pb-1 font-semibold">Used by</th></tr></thead>
+                                        <tbody><tr class="border-t border-slate-100"><td class="pr-3 py-1.5 font-mono text-welcome-blue">revenue_per_booking</td><td class="pr-3 py-1.5">finance-team</td><td class="py-1.5">14 reports</td></tr></tbody>
+                                    </table>
+                                    <p class="mt-2 text-xs text-slate-500">Defined in <code class="bg-slate-100 px-1 rounded">mart_finance.bookings</code>. Want me to show the SQL?</p>
+                                </div>
+                            </div>
+                            <!-- User followup -->
+                            <div class="flex justify-end float-in" style="animation-delay: 0.9s">
+                                <div class="bg-welcome-blue text-white rounded-2xl rounded-tr-sm px-3.5 py-2 max-w-[80%] shadow-sm text-sm">
+                                    Yes, and tell me which reports break if I rename it.
+                                </div>
+                            </div>
+                            <!-- Loading -->
+                            <div class="flex items-start gap-2 float-in" style="animation-delay: 1.3s">
+                                <div class="w-7 h-7 rounded-lg bg-welcome-teal flex items-center justify-center text-white font-extrabold text-[10px] flex-shrink-0 mt-1">DG</div>
+                                <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-sm px-3.5 py-3 shadow-sm flex items-center gap-1.5">
+                                    <div class="w-1.5 h-1.5 bg-welcome-teal rounded-full animate-bounce"></div>
+                                    <div class="w-1.5 h-1.5 bg-welcome-teal/70 rounded-full animate-bounce" style="animation-delay: 0.15s"></div>
+                                    <div class="w-1.5 h-1.5 bg-welcome-teal/40 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
+                                    <span class="ml-2 text-xs text-slate-500">Tracing lineage…</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Input -->
+                        <div class="p-3 bg-white border-t border-slate-200">
+                            <div class="relative flex items-center">
+                                <input type="text" disabled placeholder="Ask about your data catalog…" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-lg py-2.5 pl-3 pr-10">
+                                <button class="absolute right-1.5 p-1.5 text-white bg-welcome-blue rounded-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guardrails panel -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 sticky top-24">
+                        <div class="flex items-center gap-2 mb-5">
+                            <svg class="w-5 h-5 text-welcome-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                            <h3 class="text-lg font-extrabold text-welcome-blue">Built-in guardrails</h3>
+                        </div>
+                        <ul class="space-y-4">
+                            <li class="flex gap-3">
+                                <span class="w-6 h-6 rounded-md bg-welcome-teal/10 text-welcome-tealhover flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                </span>
+                                <div>
+                                    <p class="font-bold text-welcome-blue text-sm">Zero hallucination</p>
+                                    <p class="text-xs text-slate-600 mt-0.5 leading-relaxed">Always grounded in catalog tools. If the answer isn't in your metadata, the assistant says so.</p>
+                                </div>
+                            </li>
+                            <li class="flex gap-3">
+                                <span class="w-6 h-6 rounded-md bg-welcome-teal/10 text-welcome-tealhover flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                </span>
+                                <div>
+                                    <p class="font-bold text-welcome-blue text-sm">Read-only by default</p>
+                                    <p class="text-xs text-slate-600 mt-0.5 leading-relaxed">Live SQL is restricted to <code class="bg-slate-100 px-1 rounded text-[10px]">SELECT</code>/<code class="bg-slate-100 px-1 rounded text-[10px]">WITH</code>, dry-run, byte-capped.</p>
+                                </div>
+                            </li>
+                            <li class="flex gap-3">
+                                <span class="w-6 h-6 rounded-md bg-welcome-teal/10 text-welcome-tealhover flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                </span>
+                                <div>
+                                    <p class="font-bold text-welcome-blue text-sm">Asks before guessing</p>
+                                    <p class="text-xs text-slate-600 mt-0.5 leading-relaxed">Ambiguous prompts trigger a clarifying question — never a fabricated answer.</p>
+                                </div>
+                            </li>
+                            <li class="flex gap-3">
+                                <span class="w-6 h-6 rounded-md bg-welcome-teal/10 text-welcome-tealhover flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                </span>
+                                <div>
+                                    <p class="font-bold text-welcome-blue text-sm">Per-org feature flags</p>
+                                    <p class="text-xs text-slate-600 mt-0.5 leading-relaxed">Admins toggle which live tools the assistant can use, per source.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== HOW IT WORKS ===================== -->
+    <section id="how" class="py-24 bg-white border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="max-w-2xl mx-auto text-center mb-14">
+                <p class="text-xs font-bold text-welcome-teal uppercase tracking-[0.2em] mb-3">How it works</p>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-welcome-blue tracking-tight">From zero to governed in four steps.</h2>
+            </div>
+
+            <div class="relative">
+                <!-- Connecting line -->
+                <div class="hidden lg:block absolute top-7 left-[12%] right-[12%] h-px bg-gradient-to-r from-transparent via-welcome-teal/40 to-transparent"></div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
+                    <!-- Step 1 -->
+                    <div class="text-center">
+                        <div class="relative inline-flex w-14 h-14 rounded-full bg-white border-2 border-welcome-teal text-welcome-tealhover items-center justify-center font-extrabold text-lg shadow-sm shadow-welcome-teal/20 mb-4">1</div>
+                        <h3 class="font-bold text-welcome-blue">Connect</h3>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed">Add your sources with credentials you control. Your data never leaves your network.</p>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="text-center">
+                        <div class="relative inline-flex w-14 h-14 rounded-full bg-white border-2 border-welcome-teal text-welcome-tealhover items-center justify-center font-extrabold text-lg shadow-sm shadow-welcome-teal/20 mb-4">2</div>
+                        <h3 class="font-bold text-welcome-blue">Sync</h3>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed">A scheduled background pipeline extracts and transforms metadata automatically.</p>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="text-center">
+                        <div class="relative inline-flex w-14 h-14 rounded-full bg-white border-2 border-welcome-teal text-welcome-tealhover items-center justify-center font-extrabold text-lg shadow-sm shadow-welcome-teal/20 mb-4">3</div>
+                        <h3 class="font-bold text-welcome-blue">Govern</h3>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed">Use the dictionary, lineage and insights to clean up, document and track impact.</p>
+                    </div>
+                    <!-- Step 4 -->
+                    <div class="text-center">
+                        <div class="relative inline-flex w-14 h-14 rounded-full bg-welcome-teal text-white items-center justify-center font-extrabold text-lg glow-teal mb-4">4</div>
+                        <h3 class="font-bold text-welcome-blue">Discover</h3>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed">Ask the assistant anything about your data — it answers from your catalog, not the internet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== FINAL CTA ===================== -->
+    <section id="cta" class="py-20 bg-slate-50">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="relative bg-welcome-blue rounded-3xl p-10 md:p-14 text-center overflow-hidden shadow-2xl shadow-welcome-blue/20">
+                <div class="absolute top-0 right-0 -mr-32 -mt-32 w-80 h-80 bg-welcome-teal/20 rounded-full blur-3xl"></div>
+                <div class="absolute bottom-0 left-0 -ml-32 -mb-32 w-80 h-80 bg-welcome-teal/10 rounded-full blur-3xl"></div>
+
+                <div class="relative">
+                    <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">Ready to bring data governance<br class="hidden md:block"> <span class="text-welcome-teal">in-house?</span></h2>
+                    <p class="mt-5 text-slate-300 text-lg max-w-xl mx-auto leading-relaxed">Get a live walkthrough of datagov on your own stack. No SaaS sign-ups, no data leaving your perimeter.</p>
+                    <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+                        <a href="mailto:hello@datagov.io?subject=datagov%20demo" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-welcome-teal hover:bg-welcome-tealhover text-white font-bold px-7 py-3.5 rounded-xl shadow-lg shadow-welcome-teal/30 transition-all hover:scale-[1.02]">
+                            Book a demo
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </a>
+                        <a href="/accounts/login/" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 text-white font-bold px-7 py-3.5 rounded-xl border border-white/20 transition-all">Sign in</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="border-t border-slate-200 bg-white">
+        <div class="max-w-7xl mx-auto px-6 py-12">
+            <div class="grid md:grid-cols-2 gap-8 items-start">
+                <!-- Brand -->
+                <div>
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-lg bg-welcome-blue flex items-center justify-center text-white font-extrabold text-[13px] shadow-md shadow-welcome-blue/30">DG</div>
+                        <span class="text-lg font-extrabold text-welcome-blue tracking-tight">datagov</span>
+                    </div>
+                    <p class="mt-4 text-sm text-slate-500 max-w-md leading-relaxed">In-house data governance. Self-hosted, white-label, model-agnostic. Your data, your rules.</p>
+                    <div class="mt-5 flex flex-wrap items-center gap-2">
+                        <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded">Self-hosted</span>
+                        <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded">White-label</span>
+                        <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded">BYO LLM</span>
+                    </div>
+                </div>
+
+                <!-- Collab -->
+                <div class="md:text-right">
+                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-[0.18em] mb-3">A collaboration between</p>
+                    <div class="flex md:justify-end items-center gap-4">
+                        <a href="https://justdataplease.com" target="_blank" rel="noopener" class="font-bold text-welcome-blue hover:text-welcome-tealhover transition-colors">justdataplease</a>
+                        <span class="text-welcome-teal font-extrabold text-lg">✕</span>
+                        <a href="https://welcomepickups.com" target="_blank" rel="noopener" class="font-bold text-welcome-blue hover:text-welcome-tealhover transition-colors">Welcome Pickups</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-10 pt-6 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+                <p>© 2026 datagov. All rights reserved.</p>
+                <div class="flex items-center gap-5">
+                    <a href="#" class="hover:text-welcome-blue transition-colors">Privacy</a>
+                    <a href="#" class="hover:text-welcome-blue transition-colors">Terms</a>
+                    <a href="mailto:hello@datagov.io" class="hover:text-welcome-blue transition-colors">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
