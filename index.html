@@ -143,7 +143,7 @@
 
                 <!-- Sub -->
                 <p class="mt-7 text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto">
-                    A white-label, self-hosted catalog with an AI assistant that only sees what <em class="text-welcome-blue not-italic font-semibold">you</em> expose, using the model <em class="text-welcome-blue not-italic font-semibold">you</em> choose. Built for teams that take privacy seriously.
+                    A white-label, self-hosted catalog with an AI assistant that explores your metadata <em class="text-welcome-blue not-italic font-semibold">and</em> queries your live data — only what <em class="text-welcome-blue not-italic font-semibold">you</em> expose, with the model <em class="text-welcome-blue not-italic font-semibold">you</em> choose. Built for teams that take privacy seriously.
                 </p>
 
                 <!-- CTAs -->
@@ -315,11 +315,12 @@
                         <div class="w-11 h-11 rounded-lg bg-welcome-teal text-white flex items-center justify-center mb-4 shadow-md shadow-welcome-teal/30">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                         </div>
-                        <div class="flex items-center gap-2 mb-1">
+                        <div class="flex items-center gap-2 mb-1 flex-wrap">
                             <h3 class="font-bold text-welcome-blue text-lg">AI Assistant</h3>
                             <span class="text-[10px] font-bold text-welcome-tealhover bg-welcome-teal/10 px-1.5 py-0.5 rounded">BYO LLM</span>
+                            <span class="text-[10px] font-bold text-welcome-tealhover bg-welcome-teal/10 px-1.5 py-0.5 rounded">Live queries</span>
                         </div>
-                        <p class="mt-2 text-sm text-slate-600 leading-relaxed">Chat over your catalog, lineage and SQL — using <strong>your</strong> model, with strict guardrails. Zero hallucination, tool-grounded answers.</p>
+                        <p class="mt-2 text-sm text-slate-600 leading-relaxed">Chat over your catalog, lineage and SQL — and now go one step further: query <strong>live</strong> PowerBI measures and BigQuery tables directly. Read-only, tool-grounded, zero hallucination.</p>
                     </div>
                 </div>
                 <!-- 6 Alerts -->
@@ -412,8 +413,8 @@
         <div class="max-w-7xl mx-auto px-6">
             <div class="max-w-2xl mx-auto text-center mb-12">
                 <p class="text-xs font-bold text-welcome-teal uppercase tracking-[0.2em] mb-3">AI assistant</p>
-                <h2 class="text-3xl md:text-4xl font-extrabold text-welcome-blue tracking-tight">An assistant that actually knows your data.</h2>
-                <p class="mt-4 text-slate-600 leading-relaxed">Grounded in your catalog. Restricted to your guardrails. Speaks <em>your</em> data definitions, not generic ones.</p>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-welcome-blue tracking-tight">An assistant that knows <em>and</em> queries your data.</h2>
+                <p class="mt-4 text-slate-600 leading-relaxed">Grounded in your catalog. Wired to your live BI &amp; warehouse — read-only, byte-capped. Speaks <em>your</em> data definitions, then fetches the actual numbers.</p>
             </div>
 
             <div class="grid lg:grid-cols-5 gap-6 items-start">
@@ -454,20 +455,26 @@
                                     <p class="mt-2 text-xs text-slate-500">Defined in <code class="bg-slate-100 px-1 rounded">mart_finance.bookings</code>. Want me to show the SQL?</p>
                                 </div>
                             </div>
-                            <!-- User followup -->
+                            <!-- User followup — live data -->
                             <div class="flex justify-end float-in" style="animation-delay: 0.9s">
                                 <div class="bg-welcome-blue text-white rounded-2xl rounded-tr-sm px-3.5 py-2 max-w-[80%] shadow-sm text-sm">
-                                    Yes, and tell me which reports break if I rename it.
+                                    And what's its <strong>live</strong> value last week?
                                 </div>
                             </div>
-                            <!-- Loading -->
-                            <div class="flex items-start gap-2 float-in" style="animation-delay: 1.3s">
+                            <!-- AI msg — live data result -->
+                            <div class="flex items-start gap-2 float-in" style="animation-delay: 1.25s">
                                 <div class="w-7 h-7 rounded-lg bg-welcome-teal flex items-center justify-center text-white font-extrabold text-[10px] flex-shrink-0 mt-1">DG</div>
-                                <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-sm px-3.5 py-3 shadow-sm flex items-center gap-1.5">
-                                    <div class="w-1.5 h-1.5 bg-welcome-teal rounded-full animate-bounce"></div>
-                                    <div class="w-1.5 h-1.5 bg-welcome-teal/70 rounded-full animate-bounce" style="animation-delay: 0.15s"></div>
-                                    <div class="w-1.5 h-1.5 bg-welcome-teal/40 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
-                                    <span class="ml-2 text-xs text-slate-500">Tracing lineage…</span>
+                                <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-sm px-3.5 py-2.5 max-w-[85%] shadow-sm text-sm text-slate-700 leading-relaxed">
+                                    <div class="flex items-center gap-1.5 mb-1.5">
+                                        <span class="text-[10px] font-bold text-welcome-tealhover bg-welcome-teal/10 px-1.5 py-0.5 rounded">LIVE · PowerBI</span>
+                                        <span class="text-[10px] text-slate-400">read-only DAX</span>
+                                    </div>
+                                    <strong class="text-welcome-blue">revenue_per_booking — last week</strong>
+                                    <table class="mt-2 w-full text-xs border-collapse">
+                                        <thead><tr class="text-left text-slate-500"><th class="pr-3 pb-1 font-semibold">Period</th><th class="pr-3 pb-1 font-semibold">Value</th><th class="pb-1 font-semibold">vs prev</th></tr></thead>
+                                        <tbody><tr class="border-t border-slate-100"><td class="pr-3 py-1.5 text-slate-600">2026-04-13 – 04-19</td><td class="pr-3 py-1.5 font-mono text-welcome-blue">€84.20</td><td class="py-1.5 text-emerald-600 font-semibold">+1.97%</td></tr></tbody>
+                                    </table>
+                                    <p class="mt-2 text-[11px] text-slate-400 italic">Live data queried from PowerBI · dataset finance_core</p>
                                 </div>
                             </div>
                         </div>
